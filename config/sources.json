@@ -5,7 +5,7 @@
       "name": "TimePad",
       "type": "api",
       "base_url": "https://api.timepad.ru/v1",
-      "enabled": true,
+      "enabled": false,
       "city": "Новосибирск",
       "category_tags": ["бизнес", "стартап", "нетворкинг", "предпринимательство", "тренинг"],
       "parse_config": {
@@ -14,11 +14,7 @@
         "params": {
           "city_ids": [78],
           "limit": 100,
-          "fields": "location,description,categories",
-          "sort": "-starts_at"
-        },
-        "cities_map": {
-          "новосибирск": 78
+          "fields": "location,description,categories"
         }
       }
     },
@@ -27,7 +23,7 @@
       "name": "Ponominalu",
       "type": "api",
       "base_url": "https://api.ponominalu.ru/v2",
-      "enabled": true,
+      "enabled": false,
       "city": "Новосибирск",
       "category_tags": ["бизнес", "конференция", "лекция", "тренинг", "семинар"],
       "parse_config": {
@@ -49,12 +45,7 @@
       "category_tags": ["бизнес", "семинар", "тренинг", "конференция"],
       "parse_config": {
         "method": "GET",
-        "endpoint": "/afisha",
-        "list_selector": ".b-event, .event-item, .afisha-item, .object-item, table.event",
-        "title_selector": "a[href*='event'], a[href*='afisha'], .title a, h2 a, h3 a",
-        "date_selector": ".date, .b-date, .event-date, .time, .b-time",
-        "link_selector": "a[href*='event'], a[href*='afisha'], a[href*='object']",
-        "price_selector": ".price, .b-price, .cost, .b-cost"
+        "endpoint": "/afisha"
       }
     },
     {
@@ -67,11 +58,7 @@
       "category_tags": ["бизнес", "тренинг", "бесплатно", "обучение", "консультация"],
       "parse_config": {
         "method": "GET",
-        "endpoint": "/events/",
-        "list_selector": ".news-item, .news-card, .event-item, .main-news-card, .news-list .item, .main-page-item",
-        "title_selector": "a:not(.icon):not([href*='#']), .name a, .title a, h3 a, h2 a",
-        "date_selector": ".date, .news-date, .info-date, .main-page-item-date, .time",
-        "link_selector": "a[href*='event'], a[href*='meropriyatie'], a.news-card__link, a.name"
+        "endpoint": "/events/"
       }
     },
     {
@@ -84,11 +71,7 @@
       "category_tags": ["стартап", "инновации", "бизнес", "форум", "акселератор"],
       "parse_config": {
         "method": "GET",
-        "endpoint": "/events/",
-        "list_selector": ".news-item, .news-card, .event-item, .main-news-card, .news-list .item",
-        "title_selector": "a:not(.icon):not([href*='#']), .name a, .title a, h3 a, h2 a",
-        "date_selector": ".date, .news-date, .info-date, .time, .main-page-item-date",
-        "link_selector": "a[href*='event'], a[href*='meropriyatie'], a.name"
+        "endpoint": "/events/"
       }
     },
     {
@@ -96,16 +79,12 @@
       "name": "Афиша НГС",
       "type": "html",
       "base_url": "https://ngs.ru",
-      "enabled": true,
+      "enabled": false,
       "city": "Новосибирск",
       "category_tags": ["бизнес", "образование", "лекция", "тренинг"],
       "parse_config": {
         "method": "GET",
-        "endpoint": "/afisha/",
-        "list_selector": "a[href*='afisha'], article, .card, .item, .post, .event-card",
-        "title_selector": "span, h3, h2, .title, .name",
-        "date_selector": ".date, time, .time, .info, .meta",
-        "link_selector": "a[href*='afisha']"
+        "endpoint": "/afisha/"
       }
     },
     {
@@ -113,16 +92,12 @@
       "name": "Сибярмарка",
       "type": "html",
       "base_url": "https://sibfair.ru",
-      "enabled": true,
+      "enabled": false,
       "city": "Новосибирск",
       "category_tags": ["выставка", "форум", "бизнес", "конференция"],
       "parse_config": {
         "method": "GET",
-        "endpoint": "/exhibitions/",
-        "list_selector": "a[href*='exposition'], .exposition-item, .exposition-list a, .catalog-item",
-        "title_selector": "span, .title, h3, h2, strong",
-        "date_selector": ".date, .period, .dates, time",
-        "link_selector": "a[href*='exposition']"
+        "endpoint": "/exhibitions/"
       }
     },
     {
@@ -130,17 +105,13 @@
       "name": "Expomap",
       "type": "html",
       "base_url": "https://www.expomap.ru",
-      "enabled": true,
+      "enabled": false,
       "city": "Новосибирск",
       "category_tags": ["выставка", "форум", "конференция", "бизнес"],
       "parse_config": {
         "method": "GET",
         "endpoint": "/exhibition/list/",
-        "params": {"city": "novosibirsk"},
-        "list_selector": ".exhibition-item, .exposition-item, .list-item, a[href*='exhibition']",
-        "title_selector": ".title a, h3 a, h2 a, strong",
-        "date_selector": ".date, .dates, .period",
-        "link_selector": "a[href*='exhibition']"
+        "params": {"city": "novosibirsk"}
       }
     }
   ]
