@@ -32,24 +32,18 @@ async def run_scrapers():
         logger.error(f"Scraping error: {e}")
 
 
-async def main():
+def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "web"
 
     if mode == "scrape":
-        await startup()
-        await run_scrapers()
+        asyncio.run(_run_scrape())
         return
 
     if mode == "bot":
-        await startup()
-        await init_bot()
-        logger.info("Starting Telegram bot polling...")
-        await start_polling()
+        asyncio.run(_run_bot())
         return
 
     if mode == "web":
-        await startup()
-        import uvicorn
         uvicorn.run(
             "app.main:app",
             host="0.0.0.0",
@@ -60,23 +54,39 @@ async def main():
         return
 
     if mode == "all":
-        await startup()
-        await init_bot()
-        bot_task = asyncio.create_task(start_polling())
-        config = uvicorn.Config(
-            "app.main:app",
-            host="0.0.0.0",
-            port=8000,
-            reload=settings.DEBUG,
-            log_level="info",
-        )
-        server = uvicorn.Server(config)
-        await asyncio.gather(server.serve(), bot_task)
+        asyncio.run(_run_all())
         return
 
     logger.error(f"Unknown mode: {mode}")
     sys.exit(1)
 
 
+async def _run_scrape():
+    await startup()
+    await run_scrapers()
+
+
+async def _run_bot():
+    await startup()
+    await init_bot()
+    logger.info("Starting Telegram bot polling...")
+    await start_polling()
+
+
+async def _run_all():
+    await startup()
+    await init_bot()
+    bot_task = asyncio.create_task(start_polling())
+    config = uvicorn.Config(
+        "app.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=settings.DEBUG,
+        log_level="info",
+    )
+    server = uvicorn.Server(config)
+    await asyncio.gather(server.serve(), bot_task)
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
