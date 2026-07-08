@@ -99,15 +99,19 @@ async def debug_sources():
         else:
             url = f"{base}{endpoint}"
         try:
-            async with httpx.AsyncClient(timeout=10, verify=False, follow_redirects=True) as client:
+            async with httpx.AsyncClient(timeout=15, verify=False, follow_redirects=True) as client:
                 resp = await client.get(url, headers=headers)
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(resp.text, "lxml")
+                text = soup.get_text(separator=" ", strip=True)[:2000]
+                links = [a.get("href") for a in soup.find_all("a", href=True) if a.get_text(strip=True)][:20]
                 results.append({
                     "id": source["id"],
                     "name": source["name"],
                     "url": url,
                     "status": resp.status_code,
-                    "content_type": resp.headers.get("content-type", ""),
-                    "error": None,
+                    "preview": text[:500],
+                    "links": links,
                 })
         except Exception as e:
             results.append({
