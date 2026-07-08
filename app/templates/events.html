@@ -86,15 +86,16 @@ function getFilters() {
 
 async function loadEvents(page = 1) {
     const filters = getFilters();
-    const params = new URLSearchParams({ page, page_size: 12, ...filters });
+    const params = new URLSearchParams();
+    params.set("page", page);
+    params.set("page_size", 12);
 
     for (const [key, val] of Object.entries(filters)) {
-        if (val !== undefined && val !== "") {
-            if (Array.isArray(val)) {
-                val.forEach(v => params.append(key, v));
-            } else {
-                params.set(key, val);
-            }
+        if (val === undefined || val === "" || val === null) continue;
+        if (Array.isArray(val)) {
+            val.forEach(v => v !== undefined && v !== null && params.append(key, v));
+        } else {
+            params.set(key, val);
         }
     }
 
