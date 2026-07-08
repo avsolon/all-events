@@ -67,7 +67,8 @@
 </div>
 
 <script>
-const EVENTS_API = "/api/events";
+const BASE_PATH = "{{ base_path }}";
+const EVENTS_API = BASE_PATH + "/api/events";
 let currentPage = 1;
 let currentFilters = { period: "upcoming" };
 
@@ -126,7 +127,7 @@ function renderEvents(data) {
                     <span class="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-1 rounded">${e.source_id}</span>
                     ${e.is_free ? '<span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded"><i class="fas fa-check-circle mr-1"></i>Бесплатно</span>' : e.price ? `<span class="text-xs font-medium text-orange-600 bg-orange-50 px-2 py-1 rounded">${e.price_text || e.price + " ₽"}</span>` : ""}
                 </div>
-                <a href="/events/${e.id}" class="block mt-1">
+                <a href="${BASE_PATH}/events/${e.id}" class="block mt-1">
                     <h3 class="text-lg font-semibold text-gray-800 hover:text-indigo-600 transition">${e.title}</h3>
                 </a>
                 <div class="mt-3 space-y-1 text-sm text-gray-500">
@@ -134,7 +135,7 @@ function renderEvents(data) {
                     ${e.venue ? `<div><i class="fas fa-map-pin mr-2"></i>${e.venue}</div>` : ""}
                 </div>
                 ${e.categories && e.categories.length ? `<div class="mt-3 flex flex-wrap gap-1">${e.categories.map(c => `<span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">${c.name}</span>`).join("")}</div>` : ""}
-                <a href="/events/${e.id}" class="mt-3 inline-block text-sm text-indigo-600 hover:text-indigo-800 font-medium">Подробнее <i class="fas fa-arrow-right ml-1"></i></a>
+                <a href="${BASE_PATH}/events/${e.id}" class="mt-3 inline-block text-sm text-indigo-600 hover:text-indigo-800 font-medium">Подробнее <i class="fas fa-arrow-right ml-1"></i></a>
             </div>
         </div>
     `).join("");

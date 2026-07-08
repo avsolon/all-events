@@ -2,6 +2,7 @@ import json
 import os
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+from urllib.parse import urlparse
 from pydantic_settings import BaseSettings
 
 
@@ -24,6 +25,11 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+
+    @property
+    def base_path(self) -> str:
+        path = urlparse(self.SITE_URL).path.rstrip("/")
+        return path
 
     @property
     def database_url(self) -> str:

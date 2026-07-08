@@ -46,6 +46,7 @@
 </div>
 
 <script>
+const BASE_PATH = "{{ base_path }}";
 let currentDate = new Date();
 let calendarData = {};
 
@@ -55,7 +56,7 @@ function getCategoryFilters() {
 
 async function loadCalendar(year, month) {
     const catIds = getCategoryFilters();
-    let url = `/api/events/calendar/${year}/${month}`;
+    let url = `${BASE_PATH}/api/events/calendar/${year}/${month}`;
     if (catIds.length > 0) {
         url += `?categories=${catIds.join("&categories=")}`;
     }
@@ -105,7 +106,7 @@ function renderCalendar(year, month) {
 
         for (const event of events) {
             const badge = document.createElement("a");
-            badge.href = `/events/${event.id}`;
+            badge.href = `${BASE_PATH}/events/${event.id}`;
             badge.className = `block text-xs px-1 py-0.5 rounded mb-0.5 truncate ${event.is_free ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`;
             badge.textContent = event.title;
             cell.appendChild(badge);
@@ -137,10 +138,10 @@ function showDayDetail(day, events) {
     container.innerHTML = events.map(e => `
         <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div>
-                <a href="/events/${e.id}" class="font-medium text-indigo-600 hover:text-indigo-800">${e.title}</a>
+                <a href="${BASE_PATH}/events/${e.id}" class="font-medium text-indigo-600 hover:text-indigo-800">${e.title}</a>
                 <div class="text-sm text-gray-500">${e.is_free ? "Бесплатно" : "Платно"} &middot; ${e.source_id}</div>
             </div>
-            <a href="/events/${e.id}" class="text-indigo-600 hover:text-indigo-800">
+            <a href="${BASE_PATH}/events/${e.id}" class="text-indigo-600 hover:text-indigo-800">
                 <i class="fas fa-arrow-right"></i>
             </a>
         </div>

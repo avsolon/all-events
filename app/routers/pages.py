@@ -19,7 +19,7 @@ router = APIRouter(tags=["pages"])
 
 def render(name: str, context: dict) -> str:
     template = templates.get_template(name)
-    return template.render(**context)
+    return template.render(base_path=settings.base_path, **context)
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -63,6 +63,6 @@ async def event_detail(request: Request, event_id: int, db: AsyncSession = Depen
     service = EventService(db)
     event = await service.get_event(event_id)
     if not event:
-        return RedirectResponse(url="/events")
+        return RedirectResponse(url=f"{settings.base_path}/events")
     content = render("event_detail.html", {"event": event})
     return HTMLResponse(content)
