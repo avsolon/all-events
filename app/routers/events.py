@@ -85,35 +85,4 @@ async def stats_overview(db: AsyncSession = Depends(get_db)):
     return {"upcoming": upcoming, "free": free}
 
 
-@router.get("/debug/sources")
-async def debug_sources():
-    """Проверяет доступность каждого источника."""
-    import httpx
-    results = []
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-        "Accept-Language": "ru-RU,ru;q=0.9",
-    }
-    for source in settings.sources:
-        cfg = source.get("parse_config", {})
-        url = source["base_url"] + cfg.get("endpoint", "/")
-        try:
-            async with httpx.AsyncClient(timeout=10, verify=False, follow_redirects=True) as client:
-                resp = await client.get(url, headers=headers)
-                results.append({
-                    "id": source["id"],
-                    "name": source["name"],
-                    "url": url,
-                    "status": resp.status_code,
-                    "content_type": resp.headers.get("content-type", ""),
-                    "error": None,
-                })
-        except Exception as e:
-            results.append({
-                "id": source["id"],
-                "name": source["name"],
-                "url": url,
-                "status": 0,
-                "error": str(e),
-            })
-    return {"sources": results}
+

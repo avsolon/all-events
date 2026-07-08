@@ -22,7 +22,7 @@ class Event(Base):
     description = Column(Text, nullable=True)
     url = Column(String(500), nullable=True)
     image_url = Column(String(500), nullable=True)
-    start_date = Column(DateTime, nullable=False)
+    start_date = Column(DateTime, nullable=True)
     end_date = Column(DateTime, nullable=True)
     city = Column(String(100), default="Новосибирск")
     address = Column(String(500), nullable=True)

@@ -2,6 +2,7 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
+import httpx
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -78,6 +79,45 @@ app.include_router(categories.router)
 @app.get("/api/health")
 async def health():
     return {"status": "ok", "app": settings.APP_NAME, "city": "Новосибирск"}
+
+
+@app.get("/api/debug/sources")
+async def debug_sources():
+    results = []
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+        "Accept-Language": "ru-RU,ru;q=0.9",
+    }
+    for source in settings.sources:
+        cfg = source.get("parse_config", {})
+        endpoint = cfg.get("endpoint", "/")
+        params = cfg.get("params", {})
+        base = source["base_url"]
+        if params:
+            from urllib.parse import urlencode
+            url = f"{base}{endpoint}?{urlencode(params)}"
+        else:
+            url = f"{base}{endpoint}"
+        try:
+            async with httpx.AsyncClient(timeout=10, verify=False, follow_redirects=True) as client:
+                resp = await client.get(url, headers=headers)
+                results.append({
+                    "id": source["id"],
+                    "name": source["name"],
+                    "url": url,
+                    "status": resp.status_code,
+                    "content_type": resp.headers.get("content-type", ""),
+                    "error": None,
+                })
+        except Exception as e:
+            results.append({
+                "id": source["id"],
+                "name": source["name"],
+                "url": url,
+                "status": 0,
+                "error": str(e),
+            })
+    return {"sources": results}
 
 
 if __name__ == "__main__":
