@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
@@ -18,12 +19,22 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+async def scrape_on_start():
+    logger.info("Running initial scraping in background...")
+    try:
+        events = await run_all_scrapers()
+        logger.info(f"Scraping completed: {len(events) if events else 0} events.")
+    except Exception as e:
+        logger.error(f"Scraping error: {e}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting All Events application...")
     await init_db()
     await init_categories()
     logger.info("Database initialized with categories")
+    asyncio.create_task(scrape_on_start())
     yield
     logger.info("Shutting down All Events application...")
 
