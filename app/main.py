@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from app.config import settings
 from app.database import init_db
@@ -18,9 +19,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+scheduler = AsyncIOScheduler()
 
-async def scrape_on_start():
-    logger.info("Running initial scraping in background...")
+
+async def scrape_all():
+    logger.info("Running scheduled scraping...")
     try:
         events = await run_all_scrapers()
         logger.info(f"Scraping completed: {len(events) if events else 0} events.")
@@ -34,9 +37,22 @@ async def lifespan(app: FastAPI):
     await init_db()
     await init_categories()
     logger.info("Database initialized with categories")
-    asyncio.create_task(scrape_on_start())
+
+    scheduler.add_job(
+        scrape_all,
+        "interval",
+        hours=settings.SCRAPE_INTERVAL_HOURS,
+        id="scrape_events",
+        replace_existing=True,
+    )
+    scheduler.start()
+    logger.info(f"Scheduler started: scraping every {settings.SCRAPE_INTERVAL_HOURS} hours")
+
+    asyncio.create_task(scrape_all())
+
     yield
     logger.info("Shutting down All Events application...")
+    scheduler.shutdown(wait=False)
 
 
 app = FastAPI(
