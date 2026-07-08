@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} - All Events{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <a href="/events" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">
+        <i class="fas fa-arrow-left mr-2"></i>Назад к мероприятиям
+    </a>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        {% if event.image_url %}
+        <img src="{{ event.image_url }}" alt="{{ event.title }}" class="w-full h-64 object-cover" onerror="this.style.display='none'">
+        {% endif %}
+
+        <div class="p-6">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-sm font-medium text-indigo-600 bg-indigo-50 px-3 py-1 rounded">{{ event.source_id }}</span>
+                {% if event.is_free %}
+                <span class="text-sm font-medium text-green-600 bg-green-50 px-3 py-1 rounded">
+                    <i class="fas fa-check-circle mr-1"></i>Бесплатно
+                </span>
+                {% elif event.price %}
+                <span class="text-sm font-medium text-orange-600 bg-orange-50 px-3 py-1 rounded">
+                    {{ event.price_text or event.price ~ " ₽" }}
+                </span>
+                {% endif %}
+                {% if event.is_online %}
+                <span class="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded">
+                    <i class="fas fa-video mr-1"></i>Онлайн
+                </span>
+                {% endif %}
+            </div>
+
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ event.title }}</h1>
+
+            {% if event.categories %}
+            <div class="flex flex-wrap gap-2 mb-4">
+                {% for cat in event.categories %}
+                <span class="text-sm bg-gray-100 text-gray-600 px-3 py-1 rounded">{{ cat.name }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <div class="text-sm text-gray-500">Дата и время</div>
+                    <div class="font-medium">
+                        {{ event.start_date.strftime('%d.%m.%Y %H:%M') if event.start_date else 'Уточняется' }}
+                        {% if event.end_date %}
+                        — {{ event.end_date.strftime('%d.%m.%Y %H:%M') }}
+                        {% endif %}
+                    </div>
+                </div>
+                {% if event.venue %}
+                <div>
+                    <div class="text-sm text-gray-500">Место проведения</div>
+                    <div class="font-medium">{{ event.venue }}</div>
+                </div>
+                {% endif %}
+                {% if event.address %}
+                <div>
+                    <div class="text-sm text-gray-500">Адрес</div>
+                    <div class="font-medium">{{ event.address }}</div>
+                </div>
+                {% endif %}
+                {% if event.organizer %}
+                <div>
+                    <div class="text-sm text-gray-500">Организатор</div>
+                    <div class="font-medium">{{ event.organizer }}</div>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if event.description %}
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">Описание</h2>
+                <div class="text-gray-600 leading-relaxed whitespace-pre-wrap">{{ event.description }}</div>
+            </div>
+            {% endif %}
+
+            <div class="flex flex-wrap gap-4">
+                {% if event.url %}
+                <a href="{{ event.url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
+                    <i class="fas fa-external-link-alt mr-2"></i>Перейти на сайт мероприятия
+                </a>
+                {% endif %}
+                {% if event.is_free %}
+                <span class="inline-flex items-center bg-green-100 text-green-800 px-6 py-3 rounded-lg font-semibold">
+                    <i class="fas fa-check-circle mr-2"></i>Бесплатное участие
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

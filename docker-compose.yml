@@ -1,0 +1,77 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: allevents
+      POSTGRES_USER: allevents
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U allevents"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      target: web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: allevents
+      DB_USER: allevents
+      DB_PASSWORD: ${DB_PASSWORD}
+      SITE_URL: ${SITE_URL}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
+      DEBUG: "false"
+    expose:
+      - "8000"
+
+  bot:
+    build:
+      context: .
+      target: bot
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: allevents
+      DB_USER: allevents
+      DB_PASSWORD: ${DB_PASSWORD}
+      SITE_URL: ${SITE_URL}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
+      DEBUG: "false"
+
+  scraper:
+    build:
+      context: .
+      target: scrape
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: allevents
+      DB_USER: allevents
+      DB_PASSWORD: ${DB_PASSWORD}
+      SITE_URL: ${SITE_URL}
+      DEBUG: "false"
+    profiles:
+      - manual
+
+volumes:
+  postgres_data:

@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Календарь - All Events{% endblock %}
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-800">Календарь мероприятий</h1>
+        <div class="flex items-center space-x-4">
+            <button id="prev-month" class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-sm">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span id="current-month-label" class="text-lg font-semibold"></span>
+            <button id="next-month" class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-sm">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex flex-wrap gap-2 mb-4">
+            {% for cat in categories %}
+            <label class="inline-flex items-center text-sm">
+                <input type="checkbox" class="category-filter mr-1" value="{{ cat.id }}" checked>
+                {{ cat.name }}
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="grid grid-cols-7 bg-gray-50 border-b">
+            <div class="p-3 text-center text-sm font-medium text-gray-600">Пн</div>
+            <div class="p-3 text-center text-sm font-medium text-gray-600">Вт</div>
+            <div class="p-3 text-center text-sm font-medium text-gray-600">Ср</div>
+            <div class="p-3 text-center text-sm font-medium text-gray-600">Чт</div>
+            <div class="p-3 text-center text-sm font-medium text-gray-600">Пт</div>
+            <div class="p-3 text-center text-sm font-medium text-gray-600">Сб</div>
+            <div class="p-3 text-center text-sm font-medium text-gray-600">Вс</div>
+        </div>
+        <div id="calendar-grid" class="grid grid-cols-7"></div>
+    </div>
+
+    <div id="day-detail" class="hidden bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4" id="day-detail-title"></h2>
+        <div id="day-events" class="space-y-4"></div>
+    </div>
+</div>
+
+<script>
+let currentDate = new Date();
+let calendarData = {};
+
+function getCategoryFilters() {
+    return Array.from(document.querySelectorAll(".category-filter:checked")).map(cb => parseInt(cb.value));
+}
+
+async function loadCalendar(year, month) {
+    const catIds = getCategoryFilters();
+    let url = `/api/events/calendar/${year}/${month}`;
+    if (catIds.length > 0) {
+        url += `?categories=${catIds.join("&categories=")}`;
+    }
+
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        calendarData = {};
+        for (const day of data.days) {
+            calendarData[day.day] = day.events;
+        }
+        renderCalendar(year, month);
+    } catch (err) {
+        console.error("Failed to load calendar:", err);
+    }
+}
+
+function renderCalendar(year, month) {
+    const grid = document.getElementById("calendar-grid");
+    const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+    document.getElementById("current-month-label").textContent = `${monthNames[month - 1]} ${year}`;
+
+    const firstDay = new Date(year, month - 1, 1);
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const startOffset = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+    const today = new Date();
+
+    grid.innerHTML = "";
+
+    for (let i = 0; i < startOffset; i++) {
+        const empty = document.createElement("div");
+        empty.className = "p-2 bg-gray-50 min-h-[100px]";
+        grid.appendChild(empty);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement("div");
+        const isToday = today.getDate() === day && today.getMonth() === month - 1 && today.getFullYear() === year;
+        cell.className = `p-2 border border-gray-100 min-h-[100px] ${isToday ? "bg-indigo-50" : ""} cursor-pointer hover:bg-gray-50 transition`;
+
+        const dayNum = document.createElement("div");
+        dayNum.className = `text-sm font-semibold mb-1 ${isToday ? "text-indigo-600" : "text-gray-700"}`;
+        dayNum.textContent = day;
+        cell.appendChild(dayNum);
+
+        const events = calendarData[day] || [];
+
+        for (const event of events) {
+            const badge = document.createElement("a");
+            badge.href = `/events/${event.id}`;
+            badge.className = `block text-xs px-1 py-0.5 rounded mb-0.5 truncate ${event.is_free ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`;
+            badge.textContent = event.title;
+            cell.appendChild(badge);
+        }
+
+        if (events.length > 0) {
+            const count = document.createElement("div");
+            count.className = "text-xs text-gray-400 mt-1";
+            count.textContent = `${events.length} событий`;
+            cell.appendChild(count);
+        }
+
+        cell.addEventListener("click", () => showDayDetail(day, events));
+        grid.appendChild(cell);
+    }
+}
+
+function showDayDetail(day, events) {
+    const detail = document.getElementById("day-detail");
+    detail.classList.remove("hidden");
+    document.getElementById("day-detail-title").textContent = `События ${day} ${document.getElementById("current-month-label").textContent}`;
+
+    const container = document.getElementById("day-events");
+    if (!events || events.length === 0) {
+        container.innerHTML = '<p class="text-gray-500">Нет мероприятий на этот день</p>';
+        return;
+    }
+
+    container.innerHTML = events.map(e => `
+        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div>
+                <a href="/events/${e.id}" class="font-medium text-indigo-600 hover:text-indigo-800">${e.title}</a>
+                <div class="text-sm text-gray-500">${e.is_free ? "Бесплатно" : "Платно"} &middot; ${e.source_id}</div>
+            </div>
+            <a href="/events/${e.id}" class="text-indigo-600 hover:text-indigo-800">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    `).join("");
+}
+
+document.getElementById("prev-month").addEventListener("click", () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    loadCalendar(currentDate.getFullYear(), currentDate.getMonth() + 1);
+});
+
+document.getElementById("next-month").addEventListener("click", () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    loadCalendar(currentDate.getFullYear(), currentDate.getMonth() + 1);
+});
+
+document.querySelectorAll(".category-filter").forEach(cb => {
+    cb.addEventListener("change", () => {
+        loadCalendar(currentDate.getFullYear(), currentDate.getMonth() + 1);
+    });
+});
+
+loadCalendar(currentDate.getFullYear(), currentDate.getMonth() + 1);
+</script>
+{% endblock %}

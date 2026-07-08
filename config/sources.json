@@ -1,0 +1,233 @@
+{
+  "sources": [
+    {
+      "id": "timepad",
+      "name": "TimePad",
+      "type": "api",
+      "base_url": "https://api.timepad.ru/v1",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["бизнес", "стартап", "нетворкинг", "предпринимательство", "тренинг"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/events",
+        "params": {
+          "city_ids": [78],
+          "limit": 100,
+          "fields": "location,description,categories"
+        },
+        "cities_map": {
+          "новосибирск": 78
+        }
+      }
+    },
+    {
+      "id": "ponominalu",
+      "name": "Ponominalu",
+      "type": "api",
+      "base_url": "https://api.ponominalu.ru/v2",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["бизнес", "конференция", "лекция", "тренинг", "семинар"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/events",
+        "params": {
+          "city_id": 65,
+          "categories": ["business"]
+        }
+      }
+    },
+    {
+      "id": "afisha_ngs",
+      "name": "Афиша НГС",
+      "type": "html",
+      "base_url": "https://afisha.ngs.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["бизнес", "образование", "лекция", "тренинг"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/novosibirsk/selection/business",
+        "list_selector": ".event-card",
+        "title_selector": ".event-card__title",
+        "date_selector": ".event-card__date",
+        "link_selector": "a.event-card__link",
+        "price_selector": ".event-card__price"
+      }
+    },
+    {
+      "id": "expomap",
+      "name": "Expomap",
+      "type": "html",
+      "base_url": "https://expomap.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["выставка", "форум", "конференция", "бизнес"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/novosibirsk/",
+        "list_selector": ".exhibition-item",
+        "title_selector": ".exhibition-item__title",
+        "date_selector": ".exhibition-item__dates",
+        "link_selector": "a.exhibition-item__link"
+      }
+    },
+    {
+      "id": "2do2go",
+      "name": "2do2go",
+      "type": "html",
+      "base_url": "https://2do2go.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["бизнес", "тренинг", "семинар", "мастер-класс", "курсы"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/novosibirsk/events/business",
+        "list_selector": ".event-item",
+        "title_selector": ".event-item__title",
+        "date_selector": ".event-item__date",
+        "link_selector": "a.event-item__link",
+        "price_selector": ".event-item__price"
+      }
+    },
+    {
+      "id": "allconferences",
+      "name": "AllConferences",
+      "type": "html",
+      "base_url": "https://allconferences.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["конференция", "форум", "симпозиум", "бизнес"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/novosibirsk/",
+        "list_selector": ".conference-item",
+        "title_selector": ".conference-item__title a",
+        "date_selector": ".conference-item__date",
+        "link_selector": "a.conference-item__link"
+      }
+    },
+    {
+      "id": "nstu_events",
+      "name": "НГТУ Мероприятия",
+      "type": "html",
+      "base_url": "https://event.nstu.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["бизнес", "стартап", "инновации", "тренинг", "лекция"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/events",
+        "list_selector": ".event-card",
+        "title_selector": ".event-card__title",
+        "date_selector": ".event-card__date",
+        "link_selector": "a.event-card__link"
+      }
+    },
+    {
+      "id": "moi_biznes",
+      "name": "Мой Бизнес НСО",
+      "type": "html",
+      "base_url": "https://mbnso.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["бизнес", "тренинг", "бесплатно", "обучение", "консультация"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/events",
+        "list_selector": ".event-card",
+        "title_selector": ".event-card__title",
+        "date_selector": ".event-card__date",
+        "link_selector": "a.event-card__link",
+        "price_selector": ".event-card__price"
+      }
+    },
+    {
+      "id": "tpp_nso",
+      "name": "ТПП НСО",
+      "type": "html",
+      "base_url": "https://tppnso.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["бизнес", "форум", "конференция", "выставка"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/events",
+        "list_selector": ".event-item",
+        "title_selector": ".event-item__title a",
+        "date_selector": ".event-item__date",
+        "link_selector": "a.event-item__link"
+      }
+    },
+    {
+      "id": "academpark",
+      "name": "Академпарк",
+      "type": "html",
+      "base_url": "https://academpark.com",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["стартап", "инновации", "бизнес", "форум", "акселератор"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/events",
+        "list_selector": ".event-card",
+        "title_selector": ".event-card__title",
+        "date_selector": ".event-card__date",
+        "link_selector": "a.event-card__link"
+      }
+    },
+    {
+      "id": "sibfair",
+      "name": "Сибярмарка",
+      "type": "html",
+      "base_url": "https://sibfair.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["выставка", "форум", "бизнес", "конференция"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/events",
+        "list_selector": ".exhibition-item",
+        "title_selector": ".exhibition-item__title",
+        "date_selector": ".exhibition-item__dates",
+        "link_selector": "a.exhibition-item__link"
+      }
+    },
+    {
+      "id": "forumsib",
+      "name": "ForumSib",
+      "type": "html",
+      "base_url": "https://forumsib.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["форум", "конференция", "бизнес", "нетворкинг"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/events",
+        "list_selector": ".forum-item",
+        "title_selector": ".forum-item__title a",
+        "date_selector": ".forum-item__date",
+        "link_selector": "a.forum-item__link"
+      }
+    },
+    {
+      "id": "vibirai",
+      "name": "Vibirai.ru",
+      "type": "html",
+      "base_url": "https://vibirai.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["бизнес", "семинар", "тренинг", "конференция"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/novosibirsk/events/business",
+        "list_selector": ".event-card",
+        "title_selector": ".event-card__title",
+        "date_selector": ".event-card__date",
+        "link_selector": "a.event-card__link",
+        "price_selector": ".event-card__price"
+      }
+    }
+  ]
+}
