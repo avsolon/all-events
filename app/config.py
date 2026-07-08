@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "All Events Novosibirsk"
     DEBUG: bool = False
     DATABASE_URL: str = f"sqlite+aiosqlite:///{Path(__file__).parent.parent / 'data' / 'events.db'}"
-    SITE_URL: str = "http://localhost:8000"
+    SITE_URL: str = "http://localhost:8090"
     TELEGRAM_BOT_TOKEN: str = ""
     TELEGRAM_CHAT_ID: str = ""
     SCRAPE_INTERVAL_HOURS: int = 6
