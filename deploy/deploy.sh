@@ -35,5 +35,10 @@ docker compose run --rm scraper
 # 5. Status
 echo ""
 echo "=== Deploy complete ==="
-echo "Web:   http://localhost:8000"
+echo "Web:   http://localhost:8090"
+echo "DB:    localhost:5433"
+echo ""
+echo "Nginx: скопируйте deploy/nginx/all-events.conf в /etc/nginx/sites-available/"
+echo "       и выполните: sudo ln -s /etc/nginx/sites-available/all-events.conf /etc/nginx/sites-enabled/"
+echo "       затем: sudo nginx -t && sudo systemctl reload nginx"
 docker compose ps
