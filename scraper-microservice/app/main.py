@@ -10,6 +10,8 @@ from app.scrapers.base import BaseScraper
 from app.scrapers.html_scraper import HtmlScraper
 from app.scrapers.timepad import TimePadScraper
 from app.scrapers.ponominalu import PonominaluScraper
+from app.scrapers.ngs import NgsScraper
+from app.scrapers.vsetreningi import VsetreningiScraper
 
 logging.basicConfig(
     level=logging.INFO,
@@ -22,16 +24,19 @@ SCRAPER_MAP = {
         "timepad": TimePadScraper,
         "ponominalu": PonominaluScraper,
     },
+    "html": {
+        "afisha_ngs": NgsScraper,
+        "vsetreningi": VsetreningiScraper,
+    },
 }
 
 
 def get_scraper(source: Dict[str, Any]) -> BaseScraper:
     source_type = source.get("type", "html")
     source_id = source["id"]
-    if source_type == "api":
-        scraper_class = SCRAPER_MAP.get(source_type, {}).get(source_id)
-        if scraper_class:
-            return scraper_class(source)
+    scraper_class = SCRAPER_MAP.get(source_type, {}).get(source_id)
+    if scraper_class:
+        return scraper_class(source)
     return HtmlScraper(source)
 
 
