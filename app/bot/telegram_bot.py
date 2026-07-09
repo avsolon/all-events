@@ -39,7 +39,7 @@ async def init_bot():
             "/week — Мероприятия на неделю\n"
             "/upcoming — Ближайшие мероприятия\n"
             "/free — Бесплатные мероприятия\n"
-            "/search <запрос> — Поиск по мероприятиям\n"
+            "/search &lt;запрос&gt; — Поиск по мероприятиям\n"
             "/categories — Категории мероприятий\n"
             "/help — Помощь",
             parse_mode="HTML",
@@ -104,7 +104,8 @@ async def init_bot():
         async with async_session() as session:
             service = EventService(session)
             result = await service.get_events(search=query, page_size=10)
-            await send_events_result(message, result, f"🔍 <b>Результаты поиска по запросу «{query}»:</b>")
+            safe_query = query.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            await send_events_result(message, result, f"🔍 <b>Результаты поиска по запросу «{safe_query}»:</b>")
 
     logger.info("Telegram bot initialized")
     return bot, dp
