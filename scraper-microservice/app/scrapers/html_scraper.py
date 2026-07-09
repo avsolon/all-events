@@ -4,7 +4,6 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 from urllib.parse import urljoin
 
-import httpx
 from bs4 import BeautifulSoup, Tag
 
 from app.scrapers.base import BaseScraper
@@ -46,7 +45,7 @@ class HtmlScraper(BaseScraper):
             url = f"{base_url}{endpoint}"
 
         try:
-            async with httpx.AsyncClient(timeout=30, verify=False, follow_redirects=True) as client:
+            async with self._client() as client:
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",

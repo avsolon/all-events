@@ -2,8 +2,6 @@ import logging
 from datetime import datetime
 from typing import List, Dict, Any
 
-import httpx
-
 from app.scrapers.base import BaseScraper
 
 logger = logging.getLogger(__name__)
@@ -20,7 +18,7 @@ class PonominaluScraper(BaseScraper):
         url = f"{base_url}{endpoint}"
 
         try:
-            async with httpx.AsyncClient(timeout=30, verify=False) as client:
+            async with self._client() as client:
                 response = await client.get(url, params=params)
                 response.raise_for_status()
                 data = response.json()
@@ -70,20 +68,25 @@ class PonominaluScraper(BaseScraper):
         url = item.get("link") or item.get("url", "")
         external_id = self.make_external_id(url) if url else str(item.get("id", ""))
 
+        description = item.get("description", "")
+        if isinstance(description, dict):
+            description = description.get("text", "")
+
         return self.normalize_event({
             "external_id": external_id,
             "title": item.get("title", ""),
-            "description": item.get("description", ""),
+            "description": description,
             "url": url,
             "image_url": item.get("poster", ""),
             "start_date": start_date,
             "end_date": end_date,
-            "address": item.get("place", {}).get("address") if item.get("place") else "",
-            "venue": item.get("place", {}).get("title") if item.get("place") else "",
             "city": self.city,
+            "address": item.get("place", {}).get("address", "") if item.get("place") else "",
+            "venue": item.get("place", {}).get("title", "") if item.get("place") else "",
             "price": price,
-            "price_text": f"{price} ₽" if price and not is_free else "Бесплатно" if is_free else "",
+            "price_text": f"от {price} ₽" if price else "",
             "is_free": is_free,
-            "organizer": item.get("organizer", {}).get("title") if item.get("organizer") else "",
-            "tags": "",
+            "is_online": item.get("type") == "online",
+            "organizer": item.get("organization", "") or item.get("organizer", ""),
+            "tags": ", ".join(item.get("categories", [])),
         })

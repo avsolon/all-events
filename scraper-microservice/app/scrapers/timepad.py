@@ -2,8 +2,6 @@ import logging
 from datetime import datetime
 from typing import List, Dict, Any
 
-import httpx
-
 from app.scrapers.base import BaseScraper
 
 logger = logging.getLogger(__name__)
@@ -20,7 +18,7 @@ class TimePadScraper(BaseScraper):
         url = f"{base_url}{endpoint}"
 
         try:
-            async with httpx.AsyncClient(timeout=30, verify=False) as client:
+            async with self._client() as client:
                 response = await client.get(url, params=params)
                 response.raise_for_status()
                 data = response.json()
@@ -81,11 +79,13 @@ class TimePadScraper(BaseScraper):
             "image_url": item.get("poster_image", {}).get("url") if item.get("poster_image") else "",
             "start_date": start_date,
             "end_date": end_date,
-            "address": (location or {}).get("address", ""),
-            "venue": (location or {}).get("name", ""),
-            "city": (location or {}).get("city", self.city),
+            "city": self.city,
+            "address": location.get("address", ""),
+            "venue": location.get("name", ""),
             "price": price,
+            "price_text": f"от {price} ₽" if price else "",
             "is_free": is_free,
-            "organizer": item.get("organization", {}).get("name") if item.get("organization") else "",
-            "tags": ",".join(tags) if tags else "",
+            "is_online": item.get("type") == "online",
+            "organizer": item.get("organization", {}).get("name", "") if item.get("organization") else "",
+            "tags": ", ".join(tags),
         })

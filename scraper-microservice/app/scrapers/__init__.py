@@ -3,6 +3,8 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import hashlib
 
+import httpx
+
 
 class BaseScraper(ABC):
     def __init__(self, source_config: Dict[str, Any]):
@@ -11,6 +13,14 @@ class BaseScraper(ABC):
         self.source_name = source_config["name"]
         self.city = source_config.get("city", "Новосибирск")
         self.category_tags = source_config.get("category_tags", [])
+
+    def _client(self) -> httpx.AsyncClient:
+        kwargs = {
+            "timeout": 30,
+            "verify": False,
+            "follow_redirects": True,
+        }
+        return httpx.AsyncClient(**kwargs)
 
     @abstractmethod
     async def parse(self) -> List[Dict[str, Any]]:

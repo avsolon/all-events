@@ -25,7 +25,7 @@
       "base_url": "https://api.ponominalu.ru/v2",
       "enabled": false,
       "city": "Новосибирск",
-      "category_tags": ["бизнес", "конференция", "лекция", "тренинг", "семинар"],
+      "category_tags": ["конференция", "лекция", "тренинг", "семинар"],
       "parse_config": {
         "method": "GET",
         "endpoint": "/events",

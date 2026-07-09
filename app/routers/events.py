@@ -1,12 +1,93 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Optional, List
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException, Header
+from pydantic import BaseModel, Field
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_db
+from app.config import settings
+from app.database import get_db, async_session
+from app.models.event import Event
+from app.models.category import Category
 from app.services.event_service import EventService
 
 router = APIRouter(prefix="/api/events", tags=["events"])
+
+
+class EventUpsert(BaseModel):
+    source_id: str
+    external_id: str = ""
+    title: str
+    description: str = ""
+    url: str = ""
+    image_url: str = ""
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    city: str = "Новосибирск"
+    address: str = ""
+    venue: str = ""
+    price: Optional[float] = None
+    price_text: str = ""
+    is_free: bool = False
+    is_online: bool = False
+    organizer: str = ""
+    contact_phone: str = ""
+    contact_email: str = ""
+    tags: str = ""
+    category_slugs: List[str] = Field(default_factory=list)
+
+
+@router.post("/upsert")
+async def upsert_events(
+    events: List[EventUpsert],
+    authorization: str = Header(""),
+):
+    if settings.SCRAPER_API_KEY and authorization != f"Bearer {settings.SCRAPER_API_KEY}":
+        raise HTTPException(status_code=403, detail="Invalid API key")
+
+    saved = 0
+    async with async_session() as session:
+        for ev in events:
+            try:
+                external_id = ev.external_id or ev.url or ev.title
+                result = await session.execute(
+                    select(Event).where(
+                        Event.source_id == ev.source_id,
+                        Event.external_id == external_id,
+                    )
+                )
+                existing = result.scalar_one_or_none()
+
+                data = ev.model_dump(exclude={"category_slugs"})
+                data["external_id"] = external_id
+
+                if existing:
+                    for key, value in data.items():
+                        if key not in ("external_id", "source_id") and value is not None:
+                            setattr(existing, key, value)
+                    existing.updated_at = datetime.utcnow()
+                    event_obj = existing
+                else:
+                    data.pop("external_id", None)
+                    event_obj = Event(**{**data, "external_id": external_id})
+                    session.add(event_obj)
+
+                await session.flush()
+
+                if ev.category_slugs:
+                    cats = await session.execute(
+                        select(Category).where(Category.slug.in_(ev.category_slugs))
+                    )
+                    event_obj.categories = cats.scalars().all()
+
+                saved += 1
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Error saving event {ev.title}: {e}")
+
+        await session.commit()
+
+    return {"saved": saved}
 
 
 @router.get("")
