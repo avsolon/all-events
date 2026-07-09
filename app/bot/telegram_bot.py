@@ -6,7 +6,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import (
+    InlineKeyboardMarkup, InlineKeyboardButton,
+    ReplyKeyboardMarkup, KeyboardButton, BotCommand,
+)
 
 from app.config import settings
 from app.database import async_session
@@ -28,21 +31,40 @@ async def init_bot():
     bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
     dp = Dispatcher()
 
+    await bot.set_my_commands([
+        BotCommand(command="start", description="Главное меню"),
+        BotCommand(command="today", description="Мероприятия на сегодня"),
+        BotCommand(command="week", description="Мероприятия на неделю"),
+        BotCommand(command="upcoming", description="Ближайшие мероприятия"),
+        BotCommand(command="free", description="Бесплатные мероприятия"),
+        BotCommand(command="search", description="Поиск по мероприятиям"),
+        BotCommand(command="categories", description="Категории"),
+        BotCommand(command="help", description="Помощь"),
+    ])
+
+    main_kb = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="📅 Сегодня"), KeyboardButton(text="📅 Неделя")],
+            [KeyboardButton(text="📅 Ближайшие"), KeyboardButton(text="🆓 Бесплатные")],
+            [KeyboardButton(text="📂 Категории"), KeyboardButton(text="🔍 Поиск")],
+        ],
+        resize_keyboard=True,
+    )
+
     @dp.message(Command("start"))
     async def cmd_start(message: types.Message):
         await message.answer(
             "👋 <b>All Events Novosibirsk</b>\n\n"
             "Бот для поиска бизнес-мероприятий в Новосибирске.\n\n"
             "<b>Команды:</b>\n"
-            "/start — Показать это сообщение\n"
             "/today — Мероприятия на сегодня\n"
             "/week — Мероприятия на неделю\n"
             "/upcoming — Ближайшие мероприятия\n"
             "/free — Бесплатные мероприятия\n"
             "/search &lt;запрос&gt; — Поиск по мероприятиям\n"
-            "/categories — Категории мероприятий\n"
-            "/help — Помощь",
+            "/categories — Категории мероприятий",
             parse_mode="HTML",
+            reply_markup=main_kb,
         )
 
     @dp.message(Command("help"))
@@ -68,22 +90,41 @@ async def init_bot():
 
     @dp.message(Command("today"))
     async def cmd_today(message: types.Message):
-        await send_events_by_period(message, "today", "📅 <b>Мероприятия на сегодня:</b>")
+        await send_events_by_period(message, "today", "📅 <b>Мероприятия на сегодня:</b>", main_kb)
+
+    @dp.message(lambda m: m.text == "📅 Сегодня")
+    async def btn_today(message: types.Message):
+        await send_events_by_period(message, "today", "📅 <b>Мероприятия на сегодня:</b>", main_kb)
 
     @dp.message(Command("week"))
     async def cmd_week(message: types.Message):
-        await send_events_by_period(message, "week", "📅 <b>Мероприятия на неделю:</b>")
+        await send_events_by_period(message, "week", "📅 <b>Мероприятия на неделю:</b>", main_kb)
+
+    @dp.message(lambda m: m.text == "📅 Неделя")
+    async def btn_week(message: types.Message):
+        await send_events_by_period(message, "week", "📅 <b>Мероприятия на неделю:</b>", main_kb)
 
     @dp.message(Command("upcoming"))
     async def cmd_upcoming(message: types.Message):
-        await send_events_by_period(message, "upcoming", "📅 <b>Ближайшие мероприятия:</b>")
+        await send_events_by_period(message, "upcoming", "📅 <b>Ближайшие мероприятия:</b>", main_kb)
+
+    @dp.message(lambda m: m.text == "📅 Ближайшие")
+    async def btn_upcoming(message: types.Message):
+        await send_events_by_period(message, "upcoming", "📅 <b>Ближайшие мероприятия:</b>", main_kb)
 
     @dp.message(Command("free"))
     async def cmd_free(message: types.Message):
         async with async_session() as session:
             service = EventService(session)
             result = await service.get_events(is_free=True, page_size=10)
-            await send_events_result(message, result, "🆓 <b>Бесплатные мероприятия:</b>")
+            await send_events_result(message, result, "🆓 <b>Бесплатные мероприятия:</b>", main_kb)
+
+    @dp.message(lambda m: m.text == "🆓 Бесплатные")
+    async def btn_free(message: types.Message):
+        async with async_session() as session:
+            service = EventService(session)
+            result = await service.get_events(is_free=True, page_size=10)
+            await send_events_result(message, result, "🆓 <b>Бесплатные мероприятия:</b>", main_kb)
 
     @dp.message(Command("categories"))
     async def cmd_categories(message: types.Message):
@@ -93,25 +134,42 @@ async def init_bot():
             lines = ["📂 <b>Категории мероприятий:</b>\n"]
             for cat in categories:
                 lines.append(f"• {cat.name}")
-            await message.answer("\n".join(lines), parse_mode="HTML")
+            await message.answer("\n".join(lines), parse_mode="HTML", reply_markup=main_kb)
+
+    @dp.message(lambda m: m.text == "📂 Категории")
+    async def btn_categories(message: types.Message):
+        async with async_session() as session:
+            service = EventService(session)
+            categories = await service.get_categories()
+            lines = ["📂 <b>Категории мероприятий:</b>\n"]
+            for cat in categories:
+                lines.append(f"• {cat.name}")
+            await message.answer("\n".join(lines), parse_mode="HTML", reply_markup=main_kb)
 
     @dp.message(Command("search"))
     async def cmd_search(message: types.Message):
         query = message.text.replace("/search", "", 1).strip()
         if not query:
-            await message.answer("🔍 Укажите поисковый запрос, например: /search тренинг")
+            await message.answer("🔍 Укажите поисковый запрос, например: /search тренинг", reply_markup=main_kb)
             return
         async with async_session() as session:
             service = EventService(session)
             result = await service.get_events(search=query, page_size=10)
             safe_query = query.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-            await send_events_result(message, result, f"🔍 <b>Результаты поиска по запросу «{safe_query}»:</b>")
+            await send_events_result(message, result, f"🔍 <b>Результаты поиска по запросу «{safe_query}»:</b>", main_kb)
+
+    @dp.message(lambda m: m.text == "🔍 Поиск")
+    async def btn_search_start(message: types.Message):
+        await message.answer("🔍 Напишите поисковый запрос, например: тренинг", reply_markup=main_kb)
 
     logger.info("Telegram bot initialized")
     return bot, dp
 
 
-async def send_events_by_period(message: types.Message, period: str, header: str):
+async def send_events_by_period(
+    message: types.Message, period: str, header: str,
+    reply_markup=None,
+):
     async with async_session() as session:
         service = EventService(session)
         now = datetime.now()
@@ -128,13 +186,16 @@ async def send_events_by_period(message: types.Message, period: str, header: str
             filters["date_from"] = now.date()
 
         result = await service.get_events(**filters, page_size=10)
-        await send_events_result(message, result, header)
+        await send_events_result(message, result, header, reply_markup)
 
 
-async def send_events_result(message: types.Message, result: dict, header: str):
+async def send_events_result(
+    message: types.Message, result: dict, header: str,
+    reply_markup=None,
+):
     events = result.get("events", [])
     if not events:
-        await message.answer(f"{header}\n\nМероприятий не найдено.")
+        await message.answer(f"{header}\n\nМероприятий не найдено.", reply_markup=reply_markup)
         return
 
     for event in events[:5]:
@@ -174,7 +235,8 @@ async def send_events_result(message: types.Message, result: dict, header: str):
     if total > 5:
         await message.answer(
             f"📊 Всего найдено: {total}. "
-            f"Больше на сайте: {settings.SITE_URL}/events"
+            f"Больше на сайте: {settings.SITE_URL}/events",
+            reply_markup=reply_markup,
         )
 
 
