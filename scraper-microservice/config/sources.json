@@ -5,7 +5,7 @@
       "name": "TimePad",
       "type": "api",
       "base_url": "https://api.timepad.ru/v1",
-      "enabled": false,
+      "enabled": true,
       "city": "Новосибирск",
       "category_tags": ["бизнес", "стартап", "нетворкинг", "предпринимательство", "тренинг"],
       "parse_config": {
@@ -16,6 +16,19 @@
           "limit": 100,
           "fields": "location,description,categories"
         }
+      }
+    },
+    {
+      "id": "vsetreningi",
+      "name": "ВсеТренинги.ру",
+      "type": "html",
+      "base_url": "https://vsetreningi.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["тренинг", "семинар", "обучение", "бизнес", "развитие", "курсы"],
+      "parse_config": {
+        "method": "GET",
+        "endpoint": "/nsk/"
       }
     },
     {
@@ -79,9 +92,9 @@
       "name": "Афиша НГС",
       "type": "html",
       "base_url": "https://ngs.ru",
-      "enabled": false,
+      "enabled": true,
       "city": "Новосибирск",
-      "category_tags": ["бизнес", "образование", "лекция", "тренинг"],
+      "category_tags": ["бизнес", "образование", "лекция", "тренинг", "выставка", "концерт"],
       "parse_config": {
         "method": "GET",
         "endpoint": "/afisha/"

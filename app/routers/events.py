@@ -74,9 +74,24 @@ async def upsert_events(
 
                 await session.flush()
 
-                if ev.category_slugs:
+                slugs = ev.category_slugs
+                if not slugs and ev.tags:
+                    TAG_MAP = {
+                        "конференция": "conference", "тренинг": "training",
+                        "семинар": "lecture", "лекция": "lecture",
+                        "нетворкинг": "networking", "выставка": "exhibition",
+                        "стартап": "startup", "инновации": "startup",
+                        "форум": "forum", "бесплатно": "free",
+                        "обучение": "courses", "предпринимательство": "startup",
+                        "акселератор": "startup", "консультация": "training",
+                        "бизнес": "conference",
+                    }
+                    slugs = list(dict.fromkeys(
+                        TAG_MAP[t] for t in ev.tags.split(",") if t.strip().lower() in TAG_MAP
+                    ))
+                if slugs:
                     cats = await session.execute(
-                        select(Category).where(Category.slug.in_(ev.category_slugs))
+                        select(Category).where(Category.slug.in_(slugs))
                     )
                     event_obj.categories = cats.scalars().all()
 
