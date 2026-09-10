@@ -61,19 +61,6 @@ async def upsert_events(
                 data = ev.model_dump(exclude={"category_slugs"})
                 data["external_id"] = external_id
 
-                if existing:
-                    for key, value in data.items():
-                        if key not in ("external_id", "source_id") and value is not None:
-                            setattr(existing, key, value)
-                    existing.updated_at = datetime.utcnow()
-                    event_obj = existing
-                else:
-                    data.pop("external_id", None)
-                    event_obj = Event(**{**data, "external_id": external_id})
-                    session.add(event_obj)
-
-                await session.flush()
-
                 slugs = ev.category_slugs
                 if not slugs and ev.tags:
                     TAG_MAP = {
@@ -89,12 +76,30 @@ async def upsert_events(
                     slugs = list(dict.fromkeys(
                         TAG_MAP[t] for t in ev.tags.split(",") if t.strip().lower() in TAG_MAP
                     ))
-                if slugs:
-                    cats = await session.execute(
-                        select(Category).where(Category.slug.in_(slugs))
-                    )
-                    event_obj.categories = cats.scalars().all()
 
+                cats = None
+                if slugs:
+                    cats = (
+                        await session.execute(
+                            select(Category).where(Category.slug.in_(slugs))
+                        )
+                    ).scalars().all()
+
+                if existing:
+                    for key, value in data.items():
+                        if key not in ("external_id", "source_id") and value is not None:
+                            setattr(existing, key, value)
+                    existing.updated_at = datetime.utcnow()
+                    if cats is not None:
+                        existing.categories = cats
+                else:
+                    data.pop("external_id", None)
+                    event_obj = Event(**{**data, "external_id": external_id})
+                    if cats is not None:
+                        event_obj.categories = cats
+                    session.add(event_obj)
+
+                await session.flush()
                 saved += 1
             except Exception as e:
                 import logging

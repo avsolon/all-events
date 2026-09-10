@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Any
 
 import httpx
@@ -50,7 +50,11 @@ def serialize_event(event: Dict[str, Any]) -> Dict[str, Any]:
     result = {}
     for key, value in event.items():
         if isinstance(value, datetime):
+            if value.tzinfo is not None:
+                value = value.astimezone(timezone.utc).replace(tzinfo=None)
             result[key] = value.isoformat()
+        elif key == "image_url" and value is None:
+            result[key] = ""
         else:
             result[key] = value
     return result
@@ -78,13 +82,16 @@ async def scrape_and_send():
     serialized = [serialize_event(e) for e in all_events]
     logger.info(f"Sending {len(serialized)} events to {settings.API_URL}")
 
+    CHUNK_SIZE = 50
     async with httpx.AsyncClient(timeout=60) as client:
-        response = await client.post(settings.API_URL, json=serialized, headers=headers)
-        if response.status_code == 200:
-            result = response.json()
-            logger.info(f"Success: {result}")
-        else:
-            logger.error(f"API error {response.status_code}: {response.text[:500]}")
+        for i in range(0, len(serialized), CHUNK_SIZE):
+            chunk = serialized[i:i + CHUNK_SIZE]
+            response = await client.post(settings.API_URL, json=chunk, headers=headers)
+            if response.status_code == 200:
+                result = response.json()
+                logger.info(f"Chunk {i // CHUNK_SIZE + 1}: {result}")
+            else:
+                logger.error(f"API error {response.status_code}: {response.text[:500]}")
 
 
 async def run_loop():
