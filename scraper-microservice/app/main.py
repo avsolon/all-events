@@ -12,6 +12,7 @@ from app.scrapers.timepad import TimePadScraper
 from app.scrapers.ponominalu import PonominaluScraper
 from app.scrapers.ngs import NgsScraper
 from app.scrapers.vsetreningi import VsetreningiScraper
+from app.scrapers.mbnso import MbnsoScraper
 
 logging.basicConfig(
     level=logging.INFO,
@@ -27,6 +28,7 @@ SCRAPER_MAP = {
     "html": {
         "afisha_ngs": NgsScraper,
         "vsetreningi": VsetreningiScraper,
+        "moi_biznes": MbnsoScraper,
     },
 }
 

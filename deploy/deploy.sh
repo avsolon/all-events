@@ -28,11 +28,7 @@ docker compose up -d
 echo "[+] Waiting for database..."
 sleep 5
 
-# 4. Run initial scrape
-echo "[+] Running initial scrape..."
-docker compose run --rm scraper
-
-# 5. Status
+# 4. Status
 echo ""
 echo "=== Deploy complete ==="
 echo "Web:   http://localhost:8090"

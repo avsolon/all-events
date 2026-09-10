@@ -71,7 +71,7 @@
       "category_tags": ["бизнес", "тренинг", "бесплатно", "обучение", "консультация"],
       "parse_config": {
         "method": "GET",
-        "endpoint": "/events/"
+        "endpoint": "/projects/"
       }
     },
     {
