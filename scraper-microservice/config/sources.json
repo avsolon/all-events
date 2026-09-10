@@ -126,6 +126,34 @@
         "endpoint": "/exhibition/list/",
         "params": {"city": "novosibirsk"}
       }
+    },
+    {
+      "id": "leader_id",
+      "name": "Leader-ID",
+      "type": "api",
+      "base_url": "https://leader-id.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["конференция", "форум", "нетворкинг", "стартап", "инновации"],
+      "parse_config": {
+        "endpoint": "/api/v4/events/search",
+        "city_id": 892,
+        "page_size": 50,
+        "max_pages": 3
+      }
+    },
+    {
+      "id": "novosibexpo",
+      "name": "Новосибирск Экспоцентр",
+      "type": "html",
+      "base_url": "https://www.novosibexpo.ru",
+      "enabled": true,
+      "city": "Новосибирск",
+      "category_tags": ["выставка", "форум", "конференция", "концерт"],
+      "parse_config": {
+        "method": "GET",
+        "years": [2026, 2027]
+      }
     }
   ]
 }

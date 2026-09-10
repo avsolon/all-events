@@ -15,7 +15,7 @@ services:
         limits:
           cpus: '1.5'
           memory: 512M
-    pids_limit: 256
+          pids: 256
     security_opt:
       - no-new-privileges:true
     healthcheck:
@@ -50,7 +50,7 @@ services:
         limits:
           cpus: '1.0'
           memory: 512M
-    pids_limit: 256
+          pids: 256
     security_opt:
       - no-new-privileges:true
 
@@ -77,7 +77,7 @@ services:
         limits:
           cpus: '1.0'
           memory: 256M
-    pids_limit: 256
+          pids: 256
     security_opt:
       - no-new-privileges:true
 
