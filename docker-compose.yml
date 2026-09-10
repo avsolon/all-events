@@ -10,6 +10,14 @@ services:
       POSTGRES_DB: allevents
       POSTGRES_USER: allevents
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 512M
+    pids_limit: 256
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U allevents"]
       interval: 5s
@@ -37,6 +45,14 @@ services:
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
       SCRAPER_API_KEY: ${SCRAPER_API_KEY}
       DEBUG: "false"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+    pids_limit: 256
+    security_opt:
+      - no-new-privileges:true
 
   bot:
     build:
@@ -56,6 +72,14 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
       DEBUG: "false"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 256M
+    pids_limit: 256
+    security_opt:
+      - no-new-privileges:true
 
 volumes:
   postgres_data:
