@@ -21,12 +21,30 @@ class EventService:
         date_to: Optional[date] = None,
         search: Optional[str] = None,
         source_id: Optional[str] = None,
+        is_upcoming: Optional[bool] = None,
         sort_by: str = "start_date",
         sort_order: str = "asc",
         page: int = 1,
         page_size: int = 20,
     ) -> Dict[str, Any]:
         query = select(Event).options(selectinload(Event.categories)).where(Event.is_active == True)
+
+        if is_upcoming is not None:
+            now = datetime.now()
+            if is_upcoming:
+                query = query.where(
+                    or_(
+                        and_(Event.end_date.is_(None), Event.start_date >= now),
+                        Event.end_date >= now,
+                    )
+                )
+            else:
+                query = query.where(
+                    and_(
+                        Event.end_date.is_(None),
+                        Event.start_date < now,
+                    )
+                )
 
         if categories:
             query = query.where(

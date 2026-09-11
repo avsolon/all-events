@@ -185,7 +185,9 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
             currentFilters.date_from = now.toISOString().split("T")[0];
             currentFilters.date_to = monthEnd.toISOString().split("T")[0];
         } else if (period === "upcoming") {
-            currentFilters.date_from = now.toISOString().split("T")[0];
+            delete currentFilters.date_from;
+            delete currentFilters.date_to;
+            currentFilters.is_upcoming = "true";
         }
         loadEvents(1);
     });

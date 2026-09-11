@@ -25,7 +25,7 @@ def render(name: str, context: dict) -> str:
 @router.get("/", response_class=HTMLResponse)
 async def index(request: Request, db: AsyncSession = Depends(get_db)):
     service = EventService(db)
-    upcoming = await service.get_events(page_size=6, sort_order="asc")
+    upcoming = await service.get_events(page_size=6, sort_order="asc", is_upcoming=True)
     categories = await service.get_categories()
     content = render("index.html", {
         "events": upcoming["events"],
