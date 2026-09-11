@@ -12,7 +12,7 @@ DEFAULT_CATEGORIES = [
     {"name": "Нетворкинг", "slug": "networking", "description": "Нетворкинг-сессии, бизнес-завтраки, встречи", "icon": "networking"},
     {"name": "Выставки", "slug": "exhibition", "description": "Деловые выставки, ярмарки, экспозиции", "icon": "exhibition"},
     {"name": "Лекции", "slug": "lecture", "description": "Лекции, открытые уроки, образовательные мероприятия", "icon": "lecture"},
-    {"name": "Стартапы", "slug": "startup", "description": "Стартап-мероприятия, питч-сессии, акселераторы", "icon": "startup"},
+    {"name": "Акселлераторы", "slug": "accelerator", "description": "Акселерационные программы и акселераторы для стартапов", "icon": "accelerator"},
     {"name": "Форумы", "slug": "forum", "description": "Бизнес-форумы, экономические форумы", "icon": "forum"},
     {"name": "Вебинары", "slug": "webinar", "description": "Онлайн-вебинары, онлайн-конференции", "icon": "webinar"},
     {"name": "Курсы", "slug": "courses", "description": "Курсы повышения квалификации, MBA, бизнес-образование", "icon": "courses"},
@@ -22,6 +22,16 @@ DEFAULT_CATEGORIES = [
 
 async def init_categories():
     async with async_session() as session:
+        result = await session.execute(
+            select(Category).where(Category.slug == "startup")
+        )
+        old = result.scalar_one_or_none()
+        if old:
+            old.slug = "accelerator"
+            old.name = "Акселлераторы"
+            old.description = "Акселерационные программы и акселераторы для стартапов"
+            await session.flush()
+
         for cat_data in DEFAULT_CATEGORIES:
             result = await session.execute(
                 select(Category).where(Category.slug == cat_data["slug"])

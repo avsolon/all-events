@@ -61,21 +61,28 @@ async def upsert_events(
                 data = ev.model_dump(exclude={"category_slugs"})
                 data["external_id"] = external_id
 
-                slugs = ev.category_slugs
-                if not slugs and ev.tags:
+                slugs = list(ev.category_slugs)
+                if ev.tags:
                     TAG_MAP = {
                         "конференция": "conference", "тренинг": "training",
                         "семинар": "lecture", "лекция": "lecture",
                         "нетворкинг": "networking", "выставка": "exhibition",
-                        "стартап": "startup", "инновации": "startup",
+                        "акселератор": "accelerator", "акселерационн": "accelerator",
                         "форум": "forum", "бесплатно": "free",
-                        "обучение": "courses", "предпринимательство": "startup",
-                        "акселератор": "startup", "консультация": "training",
+                        "обучение": "courses", "консультация": "training",
                         "бизнес": "conference",
                     }
-                    slugs = list(dict.fromkeys(
-                        TAG_MAP[t] for t in ev.tags.split(",") if t.strip().lower() in TAG_MAP
-                    ))
+                    for t in ev.tags.split(","):
+                        key = t.strip().lower()
+                        if key in TAG_MAP:
+                            slug = TAG_MAP[key]
+                            if slug not in slugs:
+                                slugs.append(slug)
+
+                text = f"{ev.title} {ev.description} {ev.tags}".lower()
+                if any(k in text for k in ("акселератор", "акселерационн")):
+                    if "accelerator" not in slugs:
+                        slugs.append("accelerator")
 
                 cats = None
                 if slugs:
@@ -120,6 +127,7 @@ async def list_events(
     search: Optional[str] = Query(None),
     source: Optional[str] = Query(None),
     is_upcoming: Optional[bool] = Query(None),
+    exclude_ended: Optional[bool] = Query(None),
     sort_by: str = Query("start_date"),
     sort_order: str = Query("asc"),
     page: int = Query(1, ge=1),
@@ -136,6 +144,7 @@ async def list_events(
         search=search,
         source_id=source,
         is_upcoming=is_upcoming,
+        exclude_ended=exclude_ended,
         sort_by=sort_by,
         sort_order=sort_order,
         page=page,

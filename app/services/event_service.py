@@ -1,6 +1,6 @@
 from datetime import datetime, date
 from typing import List, Optional, Dict, Any
-from sqlalchemy import select, func, or_, and_, case
+from sqlalchemy import select, func, or_, case
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -22,6 +22,7 @@ class EventService:
         search: Optional[str] = None,
         source_id: Optional[str] = None,
         is_upcoming: Optional[bool] = None,
+        exclude_ended: Optional[bool] = None,
         sort_by: str = "start_date",
         sort_order: str = "asc",
         page: int = 1,
@@ -32,19 +33,18 @@ class EventService:
         if is_upcoming is not None:
             now = datetime.now()
             if is_upcoming:
-                query = query.where(
-                    or_(
-                        and_(Event.end_date.is_(None), Event.start_date >= now),
-                        Event.end_date >= now,
-                    )
-                )
+                query = query.where(Event.start_date >= now)
             else:
-                query = query.where(
-                    and_(
-                        Event.end_date.is_(None),
-                        Event.start_date < now,
-                    )
+                query = query.where(Event.start_date < now)
+
+        if exclude_ended:
+            now = datetime.now()
+            query = query.where(
+                or_(
+                    Event.end_date.is_(None),
+                    Event.end_date >= now,
                 )
+            )
 
         if categories:
             query = query.where(

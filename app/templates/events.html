@@ -41,11 +41,11 @@
         </div>
         <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
             <div class="flex gap-2">
-                <button class="filter-btn active px-3 py-1 rounded text-sm font-medium bg-indigo-600 text-white" data-period="upcoming">Предстоящие</button>
+                <button class="filter-btn px-3 py-1 rounded text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-period="upcoming">Предстоящие</button>
                 <button class="filter-btn px-3 py-1 rounded text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-period="today">Сегодня</button>
                 <button class="filter-btn px-3 py-1 rounded text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-period="week">Неделя</button>
                 <button class="filter-btn px-3 py-1 rounded text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-period="month">Месяц</button>
-                <button class="filter-btn px-3 py-1 rounded text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-period="all">Все</button>
+                <button class="filter-btn active px-3 py-1 rounded text-sm font-medium bg-indigo-600 text-white" data-period="all">Все</button>
             </div>
             <div class="flex gap-2">
                 <select id="sort-select" class="border border-gray-300 rounded px-3 py-1 text-sm">
@@ -70,7 +70,7 @@
 const BASE_PATH = "{{ base_path }}";
 const EVENTS_API = BASE_PATH + "/api/events";
 let currentPage = 1;
-let currentFilters = { period: "upcoming" };
+let currentFilters = { exclude_ended: "true" };
 
 function getFilters() {
     return {
@@ -170,7 +170,7 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
 
         const now = new Date();
         const period = this.dataset.period;
-        currentFilters = {};
+        currentFilters = { exclude_ended: "true" };
         if (period === "today") {
             currentFilters.date_from = now.toISOString().split("T")[0];
             currentFilters.date_to = now.toISOString().split("T")[0];
