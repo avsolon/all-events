@@ -5,10 +5,12 @@ Novosibirsk business-events aggregator. Front (Jinja2 + Tailwind, server-rendere
 
 ## Architecture
 - `app/` FastAPI app; entry `python3 run.py web` (port 8000). Production: docker-compose (db, web, bot), nginx at 138.124.70.3/site-all-events.
-- `scraper-microservice/` — loop every SCRAPE_INTERVAL_HOURS(6h), scrapes enabled sources from `config/sources.json`, POSTs chunks of 50 to `/api/events/upsert` with Bearer API_KEY.
+- `scraper-microservice/` — loop every SCRAPE_INTERVAL_HOURS(6h), scrapes enabled sources from `config/sources.json`, POSTs chunks of 50 to `/api/events/upsert` with Bearer API_KEY. Runs locally (not in docker).
+- Sources: vsetreningi, moi_biznes, leader_id, novosibexpo, timepad (API token, date-window + relevance filtering).
 - Categories resolved server-side: scraper sends `category_slugs` (source-level via `_category_slugs()`); server upsert ALSO scans title/description/tags keywords to assign categories per-event.
 - Event filtering in `EventService.get_events`: `is_upcoming` = start_date >= now (предстоящие); `exclude_ended` = end_date is null OR end_date >= now (Все: ongoing + upcoming). Main page always is_upcoming=True.
 - Local dev SQLite: data/events.db. `.env` SCRAPER_API_KEY empty → auth skipped locally.
+- TimePad API: token in scraper `.env` (TIMEPAD_API_TOKEN, gitignored), sent as `Authorization: Bearer`. No token → 403.
 - Git: remote git@github.com:avsolon/all-events.git, branch main. Committer identity auto-configured (Ayesha Cyril), pushes work despite warnings.
 
 ## Categories (DB seeded by category_initializer.py)
@@ -22,3 +24,4 @@ Novosibirsk business-events aggregator. Front (Jinja2 + Tailwind, server-rendere
 - app/templates/events.html — list page; default period "Все" (exclude_ended=true), "Предстоящие" → is_upcoming
 - app/services/category_initializer.py — DEFAULT_CATEGORIES + startup→accelerator migration
 - scraper-microservice/app/scrapers/base.py — TAG_TO_SLUG (акселератор→accelerator), _category_slugs
+- scraper-microservice/app/scrapers/timepad.py — TimePad: date window starts_at_min/max (+1 year), sort starts_at asc, relevance filter by category_tags, drops junk (recording, year>=2049/2030 fake dates, test)
