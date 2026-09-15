@@ -7,14 +7,24 @@
       "base_url": "https://api.timepad.ru/v1",
       "enabled": true,
       "city": "Новосибирск",
-      "category_tags": ["бизнес", "стартап", "нетворкинг", "предпринимательство", "тренинг"],
+      "category_tags": [
+        "бизнес",
+        "стартап",
+        "нетворкинг",
+        "предпринимательство",
+        "тренинг"
+      ],
       "parse_config": {
         "method": "GET",
         "endpoint": "/events",
         "params": {
-          "city_ids": [78],
+          "city_ids": [
+            78
+          ],
           "limit": 100,
-          "fields": "location,description,categories"
+          "fields": "location,description,categories",
+          "sort": "starts_at",
+          "sort_direction": "asc"
         }
       }
     },
@@ -25,7 +35,14 @@
       "base_url": "https://vsetreningi.ru",
       "enabled": true,
       "city": "Новосибирск",
-      "category_tags": ["тренинг", "семинар", "обучение", "бизнес", "развитие", "курсы"],
+      "category_tags": [
+        "тренинг",
+        "семинар",
+        "обучение",
+        "бизнес",
+        "развитие",
+        "курсы"
+      ],
       "parse_config": {
         "method": "GET",
         "endpoint": "/nsk/"
@@ -38,13 +55,20 @@
       "base_url": "https://api.ponominalu.ru/v2",
       "enabled": false,
       "city": "Новосибирск",
-      "category_tags": ["конференция", "лекция", "тренинг", "семинар"],
+      "category_tags": [
+        "конференция",
+        "лекция",
+        "тренинг",
+        "семинар"
+      ],
       "parse_config": {
         "method": "GET",
         "endpoint": "/events",
         "params": {
           "city_id": 65,
-          "categories": ["business"]
+          "categories": [
+            "business"
+          ]
         }
       }
     },
@@ -55,7 +79,12 @@
       "base_url": "https://novosibirsk.vibirai.ru",
       "enabled": true,
       "city": "Новосибирск",
-      "category_tags": ["бизнес", "семинар", "тренинг", "конференция"],
+      "category_tags": [
+        "бизнес",
+        "семинар",
+        "тренинг",
+        "конференция"
+      ],
       "parse_config": {
         "method": "GET",
         "endpoint": "/afisha"
@@ -68,7 +97,13 @@
       "base_url": "https://mbnso.ru",
       "enabled": true,
       "city": "Новосибирск",
-      "category_tags": ["бизнес", "тренинг", "бесплатно", "обучение", "консультация"],
+      "category_tags": [
+        "бизнес",
+        "тренинг",
+        "бесплатно",
+        "обучение",
+        "консультация"
+      ],
       "parse_config": {
         "method": "GET",
         "endpoint": "/projects/"
@@ -81,7 +116,13 @@
       "base_url": "https://academpark.com",
       "enabled": true,
       "city": "Новосибирск",
-      "category_tags": ["стартап", "инновации", "бизнес", "форум", "акселератор"],
+      "category_tags": [
+        "стартап",
+        "инновации",
+        "бизнес",
+        "форум",
+        "акселератор"
+      ],
       "parse_config": {
         "method": "GET",
         "endpoint": "/events/"
@@ -94,7 +135,14 @@
       "base_url": "https://ngs.ru",
       "enabled": true,
       "city": "Новосибирск",
-      "category_tags": ["бизнес", "образование", "лекция", "тренинг", "выставка", "концерт"],
+      "category_tags": [
+        "бизнес",
+        "образование",
+        "лекция",
+        "тренинг",
+        "выставка",
+        "концерт"
+      ],
       "parse_config": {
         "method": "GET",
         "endpoint": "/afisha/"
@@ -107,7 +155,12 @@
       "base_url": "https://sibfair.ru",
       "enabled": false,
       "city": "Новосибирск",
-      "category_tags": ["выставка", "форум", "бизнес", "конференция"],
+      "category_tags": [
+        "выставка",
+        "форум",
+        "бизнес",
+        "конференция"
+      ],
       "parse_config": {
         "method": "GET",
         "endpoint": "/exhibitions/"
@@ -120,11 +173,18 @@
       "base_url": "https://www.expomap.ru",
       "enabled": false,
       "city": "Новосибирск",
-      "category_tags": ["выставка", "форум", "конференция", "бизнес"],
+      "category_tags": [
+        "выставка",
+        "форум",
+        "конференция",
+        "бизнес"
+      ],
       "parse_config": {
         "method": "GET",
         "endpoint": "/exhibition/list/",
-        "params": {"city": "novosibirsk"}
+        "params": {
+          "city": "novosibirsk"
+        }
       }
     },
     {
@@ -134,7 +194,13 @@
       "base_url": "https://leader-id.ru",
       "enabled": true,
       "city": "Новосибирск",
-      "category_tags": ["конференция", "форум", "нетворкинг", "стартап", "инновации"],
+      "category_tags": [
+        "конференция",
+        "форум",
+        "нетворкинг",
+        "стартап",
+        "инновации"
+      ],
       "parse_config": {
         "endpoint": "/api/v4/events/search",
         "city_id": 892,
@@ -149,10 +215,18 @@
       "base_url": "https://www.novosibexpo.ru",
       "enabled": true,
       "city": "Новосибирск",
-      "category_tags": ["выставка", "форум", "конференция", "концерт"],
+      "category_tags": [
+        "выставка",
+        "форум",
+        "конференция",
+        "концерт"
+      ],
       "parse_config": {
         "method": "GET",
-        "years": [2026, 2027]
+        "years": [
+          2026,
+          2027
+        ]
       }
     }
   ]

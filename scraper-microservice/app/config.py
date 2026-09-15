@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 class Settings(BaseSettings):
     API_URL: str = "http://localhost:8000/api/events/upsert"
     API_KEY: str = ""
+    TIMEPAD_API_TOKEN: str = ""
     SCRAPE_INTERVAL_HOURS: int = 6
     SOURCES_PATH: str = str(Path(__file__).parent.parent / "config" / "sources.json")
     PROXY_URL: str = ""
